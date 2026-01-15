@@ -1,5 +1,5 @@
 # =====================================================
-# CQF EXAM SCRIPT — Binary Classifier with MOC Backtest
+# Binary Classifier with MOC Backtest
 # =====================================================
 
 import pandas as pd
@@ -35,8 +35,8 @@ df["Label"]  = (df["Return"].shift(-1) > 0).astype(int)
 df["FwdRet"] = df["Return"].shift(-1)
 
 # Near-zero band on the dependent leg 
-EPS = 0.0025  # 25 bps (justify per asset/liquidity in the report)
-band_mask = df["FwdRet"].abs() >= EPS  # used for X/y subsets, not for P&L filtering
+EPS = 0.0025  # 25 bps
+band_mask = df["FwdRet"].abs() >= EPS  
 
 # -----------------------------
 # 2) Features on the full, continuous tape (info <= t-1)
@@ -80,7 +80,7 @@ sp = int(len(df) * 0.70)
 train_df = df.iloc[:sp].copy()
 test_df  = df.iloc[sp:].copy()
 
-# Dates & basic diagnostics (for the report)
+# Dates & basic diagnostics 
 print("Train dates:", train_df.index[0].strftime("%Y-%m-%d"), "->", train_df.index[-1].strftime("%Y-%m-%d"))
 print("Test  dates:", test_df.index[0].strftime("%Y-%m-%d"),  "->", test_df.index[-1].strftime("%Y-%m-%d"))
 
@@ -92,9 +92,9 @@ X_train_all = train_df.loc[train_mask, feats]
 y_train     = train_df.loc[train_mask, "Label"]
 
 # Test: keep two views
-X_test_all_metrics = test_df.loc[test_mask, feats]  # for classifier metrics (masked)
+X_test_all_metrics = test_df.loc[test_mask, feats]  
 y_test_metrics     = test_df.loc[test_mask, "Label"]
-X_test_all_full    = test_df[feats]                 # for backtest on full tape
+X_test_all_full    = test_df[feats]                
 y_test_full        = test_df["Label"]               
 
 
@@ -102,7 +102,7 @@ assert (X_train_all.index.equals(y_train.index))
 assert set(X_test_all_metrics.index) <= set(test_df.index)     
 assert set(test_df.index) == set(test_df["FwdRet"].dropna().index)  
 
-# Class balance (report)
+# Class balance 
 print("Class balance (train):", float(y_train.mean()))
 print("Class balance (test, metrics subset):", float(y_test_metrics.mean()) if len(y_test_metrics) else np.nan)
 
